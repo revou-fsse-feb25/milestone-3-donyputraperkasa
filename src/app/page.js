@@ -5,6 +5,7 @@ import { Menu, X, ShoppingCart, User, Headset, Truck, Search } from "lucide-reac
 import Link from "next/link";
 import Modal from "./modal/page";
 import LoginPage from "./components/login";
+import Cart from "./cart/page";
 
 //bagian inti
 export default function Home() {
@@ -26,6 +27,23 @@ export default function Home() {
   const handleCloseModal = () => setShowModal(false);
   const [newProduct, setNewProduct] = useState({ title: '', price: '', description: '' });
   const [isAdding, setIsAdding] = useState(false);
+  // Tambahkan state cartItems
+  const [cartItems, setCartItems] = useState([]);
+  // State untuk modal cart
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Ambil cart dari localStorage saat pertama kali
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cartItems");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
+  }, []);
+
+  // Simpan cart ke localStorage setiap kali berubah
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   // sumber
   useEffect(() => {
@@ -116,7 +134,20 @@ export default function Home() {
           <span className="flex items-center gap-2 mx-4 text-orange-500 font-bold border-b-2 border-orange-500 pb-1">
             <Link href="">Item</Link>
           </span>
-          <Link href="/cart" className="flex items-center gap-2 mx-4 hover:text-orange-500">Cart <ShoppingCart /></Link>
+          
+          <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex items-center gap-2 hover:text-orange-500"
+            >
+              Cart <ShoppingCart />
+            </button>
+            {cartItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {cartItems.length}
+              </span>
+            )}
+          </div>
 
           {/* bagian help desk */}
           <button
@@ -242,7 +273,19 @@ export default function Home() {
           </div>
           <div className="m-5">
             <Link href="" className="flex text-md items-center gap-2 mx-4 text-orange-500 font-bold border-b-2 border-orange-500 mb-5">Item</Link>
-            <Link href="/cart" className="flex text-md items-center gap-2 mx-4 hover:text-orange-500 mb-5">Cart <ShoppingCart /></Link>
+          <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex items-center gap-2 hover:text-orange-500"
+            >
+              Cart <ShoppingCart />
+            </button>
+            {cartItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {cartItems.length}
+              </span>
+            )}
+          </div>
             {/* <Link href="/helpDesk" className="flex text-md items-center gap-2 mx-4 hover:text-orange-500 mb-5">Help Desk <Headset /></Link> */}
             {/* bagian helpdesk sidebar */}
             <button
@@ -335,6 +378,7 @@ export default function Home() {
                 <p className="text-green-700 text-xs flex gap-2 items-center"><Truck />Guarantee arrives in 3 days</p>
                 <div className="flex justify-between items-center mt-4">
                   <div className="flex gap-2">
+
                     {/* bagian help desk */}
                     <button
                       onClick={() => setHelpDesk(true)}
@@ -359,17 +403,18 @@ export default function Home() {
                         Send
                       </button>
                     </Modal>
-                    <button className="text-orange-500 hover:text-orange-700 p-2"><ShoppingCart /></button>
+                    {/* <button className="text-orange-500 hover:text-orange-700 p-2"><ShoppingCart /></button> */}
                   </div>
 
-                  {/* bagian buy now */}
+                  {/* bagian add cart nya */}
                   <button
                     onClick={() => {
                       setSelectProduct(item);
                       setShowPayment(true);
-                    } }
+                      setCartItems(prev => [...prev, item]);
+                    }}
                     className="bg-orange-500 hover:bg-orange-700 text-white py-2 px-4 rounded">
-                    Buy Now
+                    <ShoppingCart />
                   </button>
 
 
@@ -381,7 +426,7 @@ export default function Home() {
                         <p className="mb-4"><strong>Price:</strong> ${selectedProduct.price}</p>
 
                         <div className="mb-4">
-                          <label className="block text-sm font-semibold mb-1">Rincian Pembayaran</label>
+                          {/* <label className="block text-sm font-semibold mb-1">Rincian Pembayaran</label>
                           <div className="flex justify-between">
                             <div>
                               <p> Price Product :</p>
@@ -396,9 +441,9 @@ export default function Home() {
                               <p>$10</p>
                               <p><strong>${selectedProduct.price + 15}</strong></p>
                             </div>
-                          </div>
+                          </div> */}
 
-                          <div className=" flex justify-between mt-4">
+                          {/* <div className=" flex justify-between mt-4">
                             <label className="block text-sm font-semibold mb-1">Metode Pembayaran</label>
                             <div>
                               <select className="w-full p-2 border rounded">
@@ -409,7 +454,7 @@ export default function Home() {
                                 <option value="paypal">ShopeePay</option>
                               </select>
                             </div>
-                          </div>
+                          </div> */}
                         </div>
 
                         <div className="flex justify-end gap-2">
@@ -422,18 +467,19 @@ export default function Home() {
                           <button
                             onClick={() => {
                               // logika pembayaran bisa ditambahkan di sini
-                              alert('Payment processed!');
+                              alert('add to cart successfully');
                               setShowPayment(false);
                             } }
                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
                           >
-                            Pay Now
+                            add to cart
                           </button>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
+
                 {/* bagian CRUD */}
                 <div className="flex flex-col">
                   <div className="mt-2 flex gap-2">
@@ -484,6 +530,10 @@ export default function Home() {
         )}
       </main>
 
+      {/* Modal untuk Cart */}
+      <Modal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)}>
+        <Cart cartItems={cartItems} onCartUpdate={(updatedItems) => setCartItems(updatedItems)} />
+      </Modal>
       {/* bagian footer */}
       <footer className="flex items-center justify-center h-10">
         <h1 className="text-xl font-bold text-center">mulaidarinol</h1>
