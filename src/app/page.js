@@ -1,6 +1,6 @@
 'use client';
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Menu, X, ShoppingCart, User, Headset, Truck, Search } from "lucide-react";
 import Link from "next/link";
 import Modal from "./modal/page";
@@ -14,6 +14,7 @@ export default function Home() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   // const [loggedInUser, setLoggedInUser] = useState(null); 
+  const [loggedInEmail, setLoggedInEmail] = useState("");
   const [helpDesk, setHelpDesk] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -31,6 +32,7 @@ export default function Home() {
   const [cartItems, setCartItems] = useState([]);
   // State untuk modal cart
   const [isCartOpen, setIsCartOpen] = useState(false);
+  
 
   // Ambil cart dari localStorage saat pertama kali
   useEffect(() => {
@@ -204,10 +206,21 @@ export default function Home() {
 
           {/* bagian login */}
           <div>
-            <button 
-            className="flex items-center gap-2 mx-4 hover:text-orange-500" onClick={handleOpenModal}><User /></button>
+            <button
+              className="flex items-center gap-2 mx-4 hover:text-orange-500"
+              onClick={handleOpenModal}
+            >
+              {loggedInEmail && <span className="text-sm">{loggedInEmail}</span>}
+              <User />
+            </button>
             <Modal isOpen={showModal} onClose={handleCloseModal}>
-              <LoginPage />
+              <LoginPage
+                onClose={handleCloseModal}
+                onLoginSuccess={(email) => {
+                  setLoggedInEmail(email);
+                  setShowModal(false);
+                }}
+              />
             </Modal>
           </div>
         </div>
@@ -264,7 +277,7 @@ export default function Home() {
 
       </header>
 
-      {/* bagian sidebar */}
+      {/* bagian sidebar */}=
       {isOpen && (
         <aside className="md:hidden bg-gray-300 fixed top-0 right-0 h-screen w-1/3">
           <div className="flex justify-end m-5">
@@ -273,19 +286,19 @@ export default function Home() {
           </div>
           <div className="m-5">
             <Link href="" className="flex text-md items-center gap-2 mx-4 text-orange-500 font-bold border-b-2 border-orange-500 mb-5">Item</Link>
-          <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-2 hover:text-orange-500"
-            >
-              Cart <ShoppingCart />
-            </button>
-            {cartItems.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {cartItems.length}
-              </span>
-            )}
-          </div>
+            <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="flex items-center gap-2 hover:text-orange-500"
+              >
+                Cart <ShoppingCart />
+              </button>
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cartItems.length}
+                </span>
+              )}
+            </div>
             {/* <Link href="/helpDesk" className="flex text-md items-center gap-2 mx-4 hover:text-orange-500 mb-5">Help Desk <Headset /></Link> */}
             {/* bagian helpdesk sidebar */}
             <button
@@ -314,10 +327,21 @@ export default function Home() {
 
             {/* bagian login sidebar          */}
           <div>
-            <button 
-            className="flex items-center gap-2 mx-4 hover:text-orange-500" onClick={handleOpenModal}><User /></button>
+            <button
+              className="flex items-center gap-2 mx-4 hover:text-orange-500"
+              onClick={handleOpenModal}
+            >
+              {loggedInEmail && <span className="text-sm">{loggedInEmail}</span>}
+              <User />
+            </button>
             <Modal isOpen={showModal} onClose={handleCloseModal}>
-              <LoginPage />
+              <LoginPage
+                onClose={handleCloseModal}
+                onLoginSuccess={(email) => {
+                  setLoggedInEmail(email);
+                  setShowModal(false);
+                }}
+              />
             </Modal>
           </div>
           </div>
@@ -466,7 +490,7 @@ export default function Home() {
                           </button>
                           <button
                             onClick={() => {
-                              // logika pembayaran bisa ditambahkan di sini
+                              // bagian pembayaran
                               alert('add to cart successfully');
                               setShowPayment(false);
                             } }
@@ -502,7 +526,7 @@ export default function Home() {
                     >
                       Delete
                     </button>
-                  </div>
+                </div>
                 </div>
               </div>
             );
@@ -541,3 +565,4 @@ export default function Home() {
     </div>
   );
 }
+

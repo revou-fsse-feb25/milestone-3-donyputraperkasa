@@ -1,7 +1,29 @@
 'use client';
 import React, { useState, useRef } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import LoginPage from '../components/login';
 
 export default function Cart({ cartItems = [], onCartUpdate }) {
+  // const { data: session, status } = useSession();
+  const router = useRouter();
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  // if (!session) {
+  //   return (
+  //     <div className="text-center mt-10">
+  //       <p className="text-lg font-semibold mb-4">Silakan login untuk mengakses keranjang.</p>
+  //       <button>
+
+  //         {/* <LoginPage /> */}
+  //       </button>
+  //     </div>
+  //   );
+  // }
+
   const initialItemsRef = useRef(cartItems.map(item => ({ ...item, quantity: 1 })));
   const [items, setItems] = useState(initialItemsRef.current);
 

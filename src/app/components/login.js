@@ -1,76 +1,83 @@
-'use client'
-import { useState } from "react";
+import { Route, User } from "lucide-react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+export default function LoginPage({ onClose, onLoginSuccess }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-        try {
-            const response = await fetch('https://api.escuelajs.co/api/v1/auth/login', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            if (!response.ok) {
-                throw new Error("Login gagal");
-            }
-
-            const data = await response.json();
-            console.log("data", data);
-            localStorage.setItem("access_token", data.access_token);
-            alert("Login berhasil!");
-        } catch (err) {
-            setError(err.message);
-            console.log(err.message);
-        } finally {
-            setLoading(false);
-        }
+    if (!email || !password) {
+      setError("Email dan password wajib diisi");
+      setLoading(false);
+      return;
     }
 
-    return (
+    if (!email.includes("@")) {
+      setError("Email tidak valid");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("https://api.escuelajs.co/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) throw new Error("Login gagal");
+
+      const data = await response.json();
+      localStorage.setItem("access_token", data.access_token);
+      alert("Login berhasil!");
+      onLoginSuccess?.(email); // Kirim username ke parent
+      router.push("/cart");
+      onClose?.();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4 p-4">
+        {error && <p className="text-red-500">{error}</p>}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full border p-2 rounded"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full border p-2 rounded"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+        >
+          {loading ? "Loading..." : "Login"}
+        </button>
         <div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-                <label htmlFor="email">Email</label>
-                <input 
-                    id="email"
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="masukan email"
-                    className="border rounded-md"
-                />
-                <label htmlFor="password">Password</label>
-                <input 
-                    id="password"
-                    type="password" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="masukan password"
-                    className="border rounded-md"
-                />
-                <button 
-                    type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    disabled={loading}
-                >
-                    {loading ? "Loading..." : "Login"}
-                </button>
-                {error && <p className="text-red-500">{error}</p>}
-            </form>
-            <div className="flex flex-col items-center m-3">
-                <p>email : john@mail.com</p>
-                <p>password : changeme</p>
-            </div>
-        </div>  
-    )
+          <p> email : john@mail.com</p>
+          <p> password : changeme</p>
+        </div>
+      </form>
+    </>
+  );
 }
