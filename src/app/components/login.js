@@ -39,7 +39,7 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
       localStorage.setItem("access_token", data.access_token);
       alert("Login berhasil!");
       onLoginSuccess?.(email); // Kirim username ke parent
-      router.push("/cart");
+      router.push("/");
       onClose?.();
     } catch (err) {
       setError(err.message);
