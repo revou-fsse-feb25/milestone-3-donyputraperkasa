@@ -6,7 +6,7 @@ import Link from "next/link";
 import Modal from "./modal/page";
 import LoginPage from "./components/login";
 import Cart from "./cart/page";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 //bagian inti
 export default function Home() {
@@ -274,7 +274,7 @@ console.log("Session:", session);
 
           <div>
             <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={() => signOut({ callbackUrl: "/" })}
               className="hover:text-orange-700"
             >
               Logout
