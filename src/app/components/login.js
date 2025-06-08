@@ -1,18 +1,50 @@
-import { Route, User } from "lucide-react";
-import React, { useState } from "react";
+// import { Route, User } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 
 export default function LoginPage({ onClose, onLoginSuccess }) {
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (session?.user?.role === "admin") {
+        router.push("/");
+      } else {
+        router.push("/cart");
+      }
+    }
+  }, [status, session, router]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+  const res = await signIn("credentials", {
+    redirect: false,
+    email,
+    password,
+  }); 
+  setLoading(false);
+
+  if (res.ok) {
+    const sessionRes = await fetch("/api/auth/session");
+    const session = await sessionRes.json();
+
+    if (session?.user?.role === "admin") {
+      router.push("/");
+    } else {
+      router.push("/cart");
+    }
+  } else {
+    setError("Invalid email or password");
+  }
 
     if (!email || !password) {
       setError("Email dan password wajib diisi");
@@ -27,22 +59,22 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
     }
 
     try {
-      const response = await fetch("https://api.escuelajs.co/api/v1/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
       });
 
-      if (!response.ok) throw new Error("Login gagal");
-
-      const data = await response.json();
-      localStorage.setItem("access_token", data.access_token);
-      alert("Login berhasil!");
-      onLoginSuccess?.(email); // Kirim username ke parent
-      router.push("/");
-      onClose?.();
+      if (result.error) {
+        setError("Login gagal");
+      } else {
+        alert("Login berhasil!");
+        onLoginSuccess?.(email);
+        onClose?.();
+        router.refresh();
+      }
     } catch (err) {
-      setError(err.message);
+      setError("Terjadi kesalahan saat login");
     } finally {
       setLoading(false);
     }
@@ -81,3 +113,103 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
     </>
   );
 }
+
+
+// "use client";
+
+// import { signIn, useSession } from "next-auth/react";
+// import { useState, useEffect } from "react";
+// import { useRouter } from "next/navigation";
+
+// export default function LoginPage() {
+//   const { data: session, status } = useSession();
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [error, setError] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const [mounted, setMounted] = useState(false);
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     setMounted(true);
+//   }, []);
+
+//   // 🔐 Redirect authenticated users away from login page
+//   useEffect(() => {
+//     if (status === "authenticated") {
+//       if (session?.user?.role === "admin") {
+//         router.push("/dashboard");
+//       } else {
+//         router.push("/profile");
+//       }
+//     }
+//   }, [status, session, router]);
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     setError("");
+
+//     const res = await signIn("credentials", {
+//       redirect: false,
+//       email,
+//       password,
+//     });
+
+//     setLoading(false);
+
+//     if (res.ok) {
+//       const sessionRes = await fetch("/api/auth/session");
+//       const session = await sessionRes.json();
+
+//       if (session?.user?.role === "admin") {
+//         router.push("/");
+//       } else {
+//         router.push("/");
+//       }
+//     } else {
+//       setError("Invalid email or password");
+//     }
+//   };
+
+//   if (!mounted || status === "loading") {
+//     return null; // or a loading spinner
+//   }
+
+//   return (
+//     <main className="min-h-screen flex items-center justify-center ">
+//       <form
+//         onSubmit={handleSubmit}
+//         className="p-8 rounded shadow-md w-full max-w-md"
+//       >
+//         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+//         <input
+//           type="email"
+//           placeholder="Email"
+//           value={email}
+//           onChange={(e) => setEmail(e.target.value)}
+//           required
+//           className="w-full px-4 py-2 border rounded mb-3"
+//         />
+//         <input
+//           type="password"
+//           placeholder="Password"
+//           value={password}
+//           onChange={(e) => setPassword(e.target.value)}
+//           required
+//           className="w-full px-4 py-2 border rounded mb-3"
+//         />
+//         <button
+//           type="submit"
+//           disabled={loading}
+//           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+//         >
+//           {loading ? "Logging in..." : "Login"}
+//         </button>
+//         {error && <p className="text-red-500 mt-2">{error}</p>}
+//         <p className="text-white text-center mt-2">Already have an account? <a href="/register" className="text-blue-500 underline font-bold">Sign Up</a></p>
+//       </form>
+      
+//     </main>
+//   );
+// }

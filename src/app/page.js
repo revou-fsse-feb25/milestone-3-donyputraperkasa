@@ -1,11 +1,12 @@
 'use client';
 import Image from "next/image";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, use } from "react";
 import { Menu, X, ShoppingCart, User, Headset, Truck, Search } from "lucide-react";
 import Link from "next/link";
 import Modal from "./modal/page";
 import LoginPage from "./components/login";
 import Cart from "./cart/page";
+import { useSession } from "next-auth/react";
 
 //bagian inti
 export default function Home() {
@@ -32,7 +33,29 @@ export default function Home() {
   const [cartItems, setCartItems] = useState([]);
   // State untuk modal cart
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const [showCart, setShowCart] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
+console.log("Auth Status:", status);
+console.log("Session:", session);
+
+  useEffect(() => {
+  const token = localStorage.getItem("access_token");
+  setIsAuthenticated(!!token);
+}, []);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      setShowCart(true);
+    }
+  }, [status]); 
+
+// const ShowCart = () => {
+//   if (status === "authenticated") {
+//     setShowCart(true);
+//   }
+// }
 
   // Ambil cart dari localStorage saat pertama kali
   useEffect(() => {
@@ -52,7 +75,10 @@ export default function Home() {
     const fetchDataProduct = async () => {
       try {
         setLoading(true)
-        const response = await fetch('https://api.escuelajs.co/api/v1/products');
+        const response = await fetch('https://api.escuelajs.co/api/v1/products', {
+          next: { revalidate: 60 }
+        });
+
         const data = await response.json();
         console.log(data);
         if (!response.ok) {
@@ -121,6 +147,11 @@ export default function Home() {
   return (
     <div className="h-screen w-screen">
       {/* bagian header */}
+      {status === "authenticated" ? (
+  <p>Login sukses! Tampilkan cart di sini.</p>
+) : (
+  <p>Belum login.</p>
+)}
       <header className="bg-white flex items-center p-4 outline outline-1 outline-orange-500 justify-between">
         <div className="mx-10">
           <h1 className="text-xl font-bold text-orange-500 ">mulaidarinol</h1>
@@ -137,13 +168,30 @@ export default function Home() {
             <Link href="">Item</Link>
           </span>
           
-          <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
+          {/* Bagian Cart - hanya muncul jika login */}
+          {/* <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
             <button
               onClick={() => setIsCartOpen(true)}
               className="flex items-center gap-2 hover:text-orange-500"
             >
               Cart <ShoppingCart />
             </button>
+            {cartItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {cartItems.length}
+              </span>
+          )}
+          </div> */}
+
+          <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
+            { isAuthenticated && 
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex items-center gap-2 hover:text-orange-500"
+            >
+              Cart <ShoppingCart />
+            </button>
+            }
             {cartItems.length > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 {cartItems.length}
@@ -223,6 +271,29 @@ export default function Home() {
               />
             </Modal>
           </div>
+
+          {/* Bagian Login/User */}
+          {/* <div>
+            <button
+              className="flex items-center gap-2 mx-4 hover:text-orange-500"
+              onClick={handleOpenModal}
+            >
+              {session ? (
+                <span className="text-sm">{session.user?.email || session.user?.name}</span>
+              ) : (
+                <span>Login</span>
+              )}
+              <User />
+            </button>
+            <Modal isOpen={showModal} onClose={handleCloseModal}>
+              <LoginPage
+                onClose={handleCloseModal}
+                onLoginSuccess={() => {
+                  setShowModal(false);
+                }}
+              />
+            </Modal>
+          </div> */}
         </div>
 
         {/* bagian login - mau di pisah tapi masih bingung */}
@@ -390,6 +461,7 @@ export default function Home() {
             Simpan
           </button>
         </Modal>
+
         <h2 className="text-xl font-bold pt-10 pl-20 pr-20 pb-10">kategori 1</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 ml-20 mr-20">
           {product.slice(0, visibleCount).map((item, index) => {
@@ -431,6 +503,17 @@ export default function Home() {
                   </div>
 
                   {/* bagian add cart nya */}
+                  {/* { session && 
+                  <button
+                    onClick={() => {
+                      setSelectProduct(item);
+                      setShowPayment(true);
+                      setCartItems(prev => [...prev, item]);
+                    }}
+                    className="bg-orange-500 hover:bg-orange-700 text-white py-2 px-4 rounded">
+                    <ShoppingCart />
+                  </button>
+                  } */}
                   <button
                     onClick={() => {
                       setSelectProduct(item);
@@ -558,6 +641,7 @@ export default function Home() {
       <Modal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)}>
         <Cart cartItems={cartItems} onCartUpdate={(updatedItems) => setCartItems(updatedItems)} />
       </Modal>
+
       {/* bagian footer */}
       <footer className="flex items-center justify-center h-10">
         <h1 className="text-xl font-bold text-center">mulaidarinol</h1>
