@@ -3,7 +3,7 @@ import "./globals.css";
 import SessionProviderWrapper from './components/SessionProviderWrapper';
 import { SessionProvider } from "next-auth/react";
 import { getServerSession } from "next-auth";
-import authOptions from "./api/auth/[...nextauth]/route";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

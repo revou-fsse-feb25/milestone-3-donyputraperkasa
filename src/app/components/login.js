@@ -16,7 +16,7 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
       if (session?.user?.role === "admin") {
         router.push("/");
       } else {
-        router.push("/cart");
+        router.push("/");
       }
     }
   }, [status, session, router]);
@@ -40,7 +40,7 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
     if (session?.user?.role === "admin") {
       router.push("/");
     } else {
-      router.push("/cart");
+      router.push("/");
     }
   } else {
     setError("Invalid email or password");

@@ -148,10 +148,10 @@ console.log("Session:", session);
     <div className="h-screen w-screen">
       {/* bagian header */}
       {status === "authenticated" ? (
-  <p>Login sukses! Tampilkan cart di sini.</p>
-) : (
-  <p>Belum login.</p>
-)}
+          <p>Login sukses! Tampilkan cart di sini.</p>
+        ) : (
+          <p>Belum login.</p>
+        )}
       <header className="bg-white flex items-center p-4 outline outline-1 outline-orange-500 justify-between">
         <div className="mx-10">
           <h1 className="text-xl font-bold text-orange-500 ">mulaidarinol</h1>
@@ -184,7 +184,7 @@ console.log("Session:", session);
           </div> */}
 
           <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
-            { isAuthenticated && 
+            { status === "authenticated" && 
             <button
               onClick={() => setIsCartOpen(true)}
               className="flex items-center gap-2 hover:text-orange-500"
@@ -270,6 +270,16 @@ console.log("Session:", session);
                 }}
               />
             </Modal>
+          </div>
+
+          <div>
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="hover:text-orange-700"
+            >
+              Logout
+            </button>
+
           </div>
 
           {/* Bagian Login/User */}
