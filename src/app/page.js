@@ -14,7 +14,6 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  // const [loggedInUser, setLoggedInUser] = useState(null); 
   const [loggedInEmail, setLoggedInEmail] = useState("");
   const [helpDesk, setHelpDesk] = useState(null);
   const [error, setError] = useState(null);
@@ -50,12 +49,6 @@ console.log("Session:", session);
       setShowCart(true);
     }
   }, [status]); 
-
-// const ShowCart = () => {
-//   if (status === "authenticated") {
-//     setShowCart(true);
-//   }
-// }
 
   // Ambil cart dari localStorage saat pertama kali
   useEffect(() => {
@@ -130,17 +123,6 @@ console.log("Session:", session);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Validasi sederhana
-    // if (userName && password) {
-    //   setLoggedInUser(userName); // Simpan nama user yang login
-    //   setIsModalOpen(false);     // Tutup modal
-    //   setUserName("");           // Reset form input
-    //   setPassword("");
-    //   alert("Login berhasil! \n Selamat datang " + userName);
-    // } else {
-    //   alert("Username dan password harus diisi");
-    // }
   };
 
 
@@ -167,21 +149,6 @@ console.log("Session:", session);
           <span className="flex items-center gap-2 mx-4 text-orange-500 font-bold border-b-2 border-orange-500 pb-1">
             <Link href="">Item</Link>
           </span>
-          
-          {/* Bagian Cart - hanya muncul jika login */}
-          {/* <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-2 hover:text-orange-500"
-            >
-              Cart <ShoppingCart />
-            </button>
-            {cartItems.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {cartItems.length}
-              </span>
-          )}
-          </div> */}
 
           <div className="relative mx-4 hover:text-orange-500 flex items-center gap-2">
             { status === "authenticated" && 
@@ -279,82 +246,8 @@ console.log("Session:", session);
             >
               Logout
             </button>
-
           </div>
-
-          {/* Bagian Login/User */}
-          {/* <div>
-            <button
-              className="flex items-center gap-2 mx-4 hover:text-orange-500"
-              onClick={handleOpenModal}
-            >
-              {session ? (
-                <span className="text-sm">{session.user?.email || session.user?.name}</span>
-              ) : (
-                <span>Login</span>
-              )}
-              <User />
-            </button>
-            <Modal isOpen={showModal} onClose={handleCloseModal}>
-              <LoginPage
-                onClose={handleCloseModal}
-                onLoginSuccess={() => {
-                  setShowModal(false);
-                }}
-              />
-            </Modal>
-          </div> */}
         </div>
-
-        {/* bagian login - mau di pisah tapi masih bingung */}
-        {/* <div className="hidden md:flex mx-10">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 mx-4 hover:text-orange-500"
-        >
-          {loggedInUser ? loggedInUser : "Login"} <User />
-        </button>
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            <h2 className="font-bold text-2xl mb-5 text-center">Please Login</h2>
-            <form onSubmit={handleSubmit} className="space-y-2">
-              <div>
-                <label>Username</label>
-                <input
-                  type="text"
-                  placeholder="Enter Your Username"
-                  className="w-full border p-2 rounded mb-4"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                />
-              </div>
-              <div>
-                <label>Password</label>
-                <input
-                  type="password"
-                  placeholder="Enter Your Password"
-                  className="w-full border p-2 rounded mb-4"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="w-full bg-red-500 hover:bg-red-700 text-white py-2 rounded"
-                >
-                  Reset
-                </button>
-                <button
-                  type="submit"
-                  className="w-full bg-blue-500 hover:bg-blue-700 text-white py-2 rounded"
-                >
-                  Login
-                </button>
-              </div>
-            </form>
-        </Modal>
-        </div> */}
 
       </header>
 
@@ -509,21 +402,8 @@ console.log("Session:", session);
                         Send
                       </button>
                     </Modal>
-                    {/* <button className="text-orange-500 hover:text-orange-700 p-2"><ShoppingCart /></button> */}
                   </div>
 
-                  {/* bagian add cart nya */}
-                  {/* { session && 
-                  <button
-                    onClick={() => {
-                      setSelectProduct(item);
-                      setShowPayment(true);
-                      setCartItems(prev => [...prev, item]);
-                    }}
-                    className="bg-orange-500 hover:bg-orange-700 text-white py-2 px-4 rounded">
-                    <ShoppingCart />
-                  </button>
-                  } */}
                   <button
                     onClick={() => {
                       setSelectProduct(item);
