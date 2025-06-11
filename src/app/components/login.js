@@ -16,47 +16,26 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
       if (session?.user?.role === "admin") {
         router.push("/");
       } else {
-        router.push("/");
+        router.push("/cart");
       }
     }
   }, [status, session, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-
-  const res = await signIn("credentials", {
-    redirect: false,
-    email,
-    password,
-  }); 
-  setLoading(false);
-
-  if (res.ok) {
-    const sessionRes = await fetch("/api/auth/session");
-    const session = await sessionRes.json();
-
-    if (session?.user?.role === "admin") {
-      router.push("/");
-    } else {
-      router.push("/");
-    }
-  } else {
-    setError("Invalid email or password");
-  }
 
     if (!email || !password) {
       setError("Email dan password wajib diisi");
-      setLoading(false);
       return;
     }
 
     if (!email.includes("@")) {
       setError("Email tidak valid");
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
+    setError("");
 
     try {
       const result = await signIn("credentials", {
@@ -68,6 +47,15 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
       if (result.error) {
         setError("Login gagal");
       } else {
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+
+        if (session?.user?.role === "admin") {
+          router.push("/");
+        } else {
+          router.push("/cart");
+        }
+
         alert("Login berhasil!");
         onLoginSuccess?.(email);
         onClose?.();
@@ -79,6 +67,8 @@ export default function LoginPage({ onClose, onLoginSuccess }) {
       setLoading(false);
     }
   };
+
+  if (status === "loading") return <p>Loading...</p>;
 
   return (
     <>

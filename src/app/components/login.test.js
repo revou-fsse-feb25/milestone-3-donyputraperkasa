@@ -1,3 +1,16 @@
+jest.mock('next-auth/react', () => ({
+  signIn: jest.fn(() => Promise.resolve({ error: null })),
+  useSession: () => ({
+    data: {
+      user: {
+        name: 'John Doe',
+        email: 'john@mail.com',
+        role: 'user',
+      },
+    },
+    status: 'authenticated',
+  }),
+}));
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LoginPage from './login';
 
